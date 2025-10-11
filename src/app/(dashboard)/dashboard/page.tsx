@@ -2,7 +2,6 @@ import { currentUser } from '@clerk/nextjs/server'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
 
 export default async function DashboardPage() {
   const user = await currentUser()
@@ -15,7 +14,7 @@ export default async function DashboardPage() {
           Welcome back, {user?.firstName || 'there'}! 👋
         </h1>
         <p className="text-muted-foreground mt-2">
-          Here's what's happening with your prompts today.
+          Here&apos;s what&apos;s happening with your prompts today.
         </p>
       </div>
 

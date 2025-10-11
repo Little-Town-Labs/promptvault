@@ -132,7 +132,7 @@ export default function NewPromptPage() {
         throw new Error(error.message || 'Failed to create prompt')
       }
 
-      const prompt = await response.json()
+      const _prompt = await response.json()
 
       // Redirect to prompts list
       router.push('/prompts')

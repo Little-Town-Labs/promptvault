@@ -396,7 +396,7 @@ export default function PromptsPage() {
           <DialogHeader>
             <DialogTitle>Delete Prompt</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{promptToDelete?.title}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{promptToDelete?.title}&quot;? This action cannot be undone.
               All versions, comments, and associated data will be permanently deleted.
             </DialogDescription>
           </DialogHeader>

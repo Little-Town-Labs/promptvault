@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     const tag = searchParams.get('tag')
 
     // Build where clause
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {
       organizationId: orgId || `user_${userId}`, // Fallback to user-based org if no org
     }

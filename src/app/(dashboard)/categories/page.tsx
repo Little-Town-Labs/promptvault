@@ -519,7 +519,7 @@ export default function CategoriesPage() {
           <DialogHeader>
             <DialogTitle>Delete Category</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{selectedCategory?.name}"?
+              Are you sure you want to delete &quot;{selectedCategory?.name}&quot;?
               {selectedCategory && selectedCategory.promptCount > 0 && (
                 <span className="block mt-2 text-destructive">
                   This category has {selectedCategory.promptCount} prompt{selectedCategory.promptCount !== 1 ? 's' : ''}. Please reassign or delete them first.

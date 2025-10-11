@@ -90,6 +90,7 @@ export default function PromptDetailPage() {
 
   useEffect(() => {
     fetchPrompt()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id])
 
   const fetchPrompt = async () => {
@@ -473,7 +474,7 @@ export default function PromptDetailPage() {
           <DialogHeader>
             <DialogTitle>Delete Prompt</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{prompt.title}"? This action cannot be undone.
+              Are you sure you want to delete &quot;{prompt.title}&quot;? This action cannot be undone.
               All versions, comments, and associated data will be permanently deleted.
             </DialogDescription>
           </DialogHeader>

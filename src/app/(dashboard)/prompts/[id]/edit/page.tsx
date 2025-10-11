@@ -54,6 +54,7 @@ export default function EditPromptPage() {
   useEffect(() => {
     fetchPrompt()
     fetchCategories()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id])
 
   const fetchCategories = async () => {
@@ -449,7 +450,7 @@ export default function EditPromptPage() {
             <li>Versions are automatically numbered (v1, v2, v3...)</li>
             <li>Previous versions are preserved and can be viewed</li>
             <li>Only content changes create new versions</li>
-            <li>Metadata changes (title, description, tags) don't create versions</li>
+            <li>Metadata changes (title, description, tags) don&apos;t create versions</li>
           </ul>
         </CardContent>
       </Card>

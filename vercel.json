@@ -4,21 +4,5 @@
   "installCommand": "pnpm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "env": {
-    "NEXT_PUBLIC_APP_URL": "@production-url"
-  },
-  "build": {
-    "env": {
-      "DATABASE_URL": "@database-url",
-      "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": "@clerk-publishable-key",
-      "CLERK_SECRET_KEY": "@clerk-secret-key"
-    }
-  },
-  "regions": ["iad1"],
-  "functions": {
-    "api/**/*.ts": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  }
+  "regions": ["iad1"]
 }

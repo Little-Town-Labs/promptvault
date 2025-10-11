@@ -20,8 +20,7 @@ export async function POST(
     })
 
     if (!user) {
-      const clerkUser = await import('@clerk/nextjs/server').then(m => m.currentUser())
-      const currentUser = await clerkUser()
+      const currentUser = await import('@clerk/nextjs/server').then(m => m.currentUser())
 
       user = await prisma.user.create({
         data: {

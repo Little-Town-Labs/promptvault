@@ -51,6 +51,7 @@
     "@upstash/redis": "^1.28.0",
     "@vercel/analytics": "^1.2.0",
     "@vercel/blob": "^0.22.0",
+    "@vercel/speed-insights": "^1.2.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^1.0.0",

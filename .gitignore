@@ -53,4 +53,6 @@ prisma/migrations/
 
 # OS
 Thumbs.db
-nul
+
+# Build cache
+tsconfig.tsbuildinfo

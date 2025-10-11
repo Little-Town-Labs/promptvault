@@ -5,7 +5,7 @@
   "description": "Multi-tenant prompt management platform",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -22,6 +22,7 @@
     "test:coverage": "vitest run --coverage",
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
+    "postinstall": "prisma generate",
     "prepare": "husky install"
   },
   "dependencies": {

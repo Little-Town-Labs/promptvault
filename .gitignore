@@ -56,3 +56,6 @@ Thumbs.db
 
 # Build cache
 tsconfig.tsbuildinfo
+
+# Corrupted files
+{src

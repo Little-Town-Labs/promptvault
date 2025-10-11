@@ -1,0 +1,338 @@
+// Prompt Vault Database Schema
+// Multi-tenant prompt management platform
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// CORE MODELS
+// ============================================
+
+model Organization {
+  id         String   @id @default(cuid())
+  name       String
+  slug       String   @unique
+  clerkOrgId String   @unique // Clerk organization ID
+  plan       Plan     @default(FREE)
+  status     Status   @default(ACTIVE)
+
+  users       OrganizationUser[]
+  prompts     Prompt[]
+  categories  Category[]
+  collections Collection[]
+  tags        Tag[]
+  apiKeys     ApiKey[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clerkOrgId])
+  @@map("organizations")
+}
+
+model User {
+  id          String  @id @default(cuid())
+  clerkUserId String  @unique // Clerk user ID
+  email       String  @unique
+  firstName   String?
+  lastName    String?
+  avatarUrl   String?
+
+  organizations  OrganizationUser[]
+  prompts        Prompt[]
+  promptVersions PromptVersion[]
+  comments       Comment[]
+  favorites      Favorite[]
+  activities     Activity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clerkUserId])
+  @@index([email])
+  @@map("users")
+}
+
+model OrganizationUser {
+  id             String @id @default(cuid())
+  organizationId String
+  userId         String
+  role           Role   @default(VIEWER)
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+  @@map("organization_users")
+}
+
+// ============================================
+// PROMPT MODELS
+// ============================================
+
+model Prompt {
+  id             String       @id @default(cuid())
+  organizationId String
+  authorId       String
+  title          String
+  description    String?      @db.Text
+  content        String       @db.Text
+  variables      Json?        // Variable[] as JSON
+  status         PromptStatus @default(DRAFT)
+  visibility     Visibility   @default(ORGANIZATION)
+
+  categoryId   String?
+  collectionId String?
+
+  // Metadata for AI model settings
+  metadata Json? // { model, temperature, maxTokens, etc. }
+
+  // Usage statistics
+  viewCount     Int @default(0)
+  useCount      Int @default(0)
+  favoriteCount Int @default(0)
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  author       User          @relation(fields: [authorId], references: [id])
+  category     Category?     @relation(fields: [categoryId], references: [id])
+  collection   Collection?   @relation(fields: [collectionId], references: [id])
+  tags         PromptTag[]
+  versions     PromptVersion[]
+  comments     Comment[]
+  favorites    Favorite[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  publishedAt DateTime?
+
+  @@index([organizationId])
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([collectionId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("prompts")
+}
+
+model PromptVersion {
+  id                String  @id @default(cuid())
+  promptId          String
+  version           Int
+  content           String  @db.Text
+  variables         Json?
+  changeDescription String? @db.Text
+  createdById       String
+
+  prompt    Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  createdBy User   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([promptId, version])
+  @@index([promptId])
+  @@index([createdById])
+  @@map("prompt_versions")
+}
+
+// ============================================
+// ORGANIZATION MODELS
+// ============================================
+
+model Category {
+  id             String  @id @default(cuid())
+  organizationId String
+  name           String
+  slug           String
+  description    String?
+  color          String? // Hex color code
+  icon           String? // Emoji or icon name
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  prompts      Prompt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@map("categories")
+}
+
+model Collection {
+  id             String  @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?
+  parentId       String? // For nested collections
+
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parent       Collection?   @relation("CollectionHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children     Collection[]  @relation("CollectionHierarchy")
+  prompts      Prompt[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([parentId])
+  @@map("collections")
+}
+
+model Tag {
+  id             String  @id @default(cuid())
+  organizationId String
+  name           String
+  slug           String
+  color          String? // Hex color code
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  prompts      PromptTag[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@map("tags")
+}
+
+model PromptTag {
+  promptId String
+  tagId    String
+
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([promptId, tagId])
+  @@index([promptId])
+  @@index([tagId])
+  @@map("prompt_tags")
+}
+
+// ============================================
+// COLLABORATION MODELS
+// ============================================
+
+model Comment {
+  id       String  @id @default(cuid())
+  promptId String
+  authorId String
+  content  String  @db.Text
+  parentId String? // For threaded comments
+
+  prompt  Prompt    @relation(fields: [promptId], references: [id], onDelete: Cascade)
+  author  User      @relation(fields: [authorId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies Comment[] @relation("CommentReplies")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([promptId])
+  @@index([authorId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+model Favorite {
+  id       String @id @default(cuid())
+  userId   String
+  promptId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prompt Prompt @relation(fields: [promptId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, promptId])
+  @@index([userId])
+  @@index([promptId])
+  @@map("favorites")
+}
+
+model Activity {
+  id             String  @id @default(cuid())
+  organizationId String
+  userId         String
+  entityType     String
+  entityId       String
+  action         String
+  metadata       Json? // Additional context about the action
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([entityId])
+  @@index([createdAt])
+  @@map("activities")
+}
+
+// ============================================
+// API & SECURITY MODELS
+// ============================================
+
+model ApiKey {
+  id             String    @id @default(cuid())
+  organizationId String
+  name           String
+  key            String    @unique
+  lastUsedAt     DateTime?
+  expiresAt      DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([organizationId])
+  @@index([key])
+  @@map("api_keys")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  OWNER
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+enum Plan {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum Status {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum PromptStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Visibility {
+  PRIVATE
+  ORGANIZATION
+  PUBLIC
+}

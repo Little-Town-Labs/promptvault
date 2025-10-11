@@ -48,26 +48,22 @@ Click **"Environment Variables"** and add these:
 
 #### **Required Variables:**
 
-```env
-# Database (from Neon)
-DATABASE_URL=postgresql://neondb_owner:npg_BMCKZF1lovi8@ep-fragrant-recipe-adtlxbl5-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+In Vercel environment variables, enter these **exactly as shown** (values will be different for your project):
 
-# Clerk Authentication (from Clerk Dashboard)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_dG91Y2hlZC1sb2JzdGVyLTg1LmNsZXJrLmFjY291bnRzLmRldiQ
-CLERK_SECRET_KEY=sk_test_NqIUXVVnRxVgK1giDruSR5t5TiB5u4aHoiZ2u5R08b
+| **Name** | **Value** | **Environment** | **Notes** |
+|----------|-----------|------------------|-----------|
+| `DATABASE_URL` | `postgresql://neondb_owner:npg_xxxx@ep-xxxxxx-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require` | Production, Preview | Your Neon connection string |
+| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx` | Production, Preview | From Clerk Dashboard → API Keys |
+| `CLERK_SECRET_KEY` | `sk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx` | Production, Preview | From Clerk Dashboard → API Keys |
+| `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | `/sign-in` | Production, Preview | Keep as-is |
+| `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | `/sign-up` | Production, Preview | Keep as-is |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL` | `/dashboard` | Production, Preview | Keep as-is |
+| `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL` | `/dashboard` | Production, Preview | Keep as-is |
+| `NEXT_PUBLIC_APP_URL` | `https://your-project.vercel.app` | Production, Preview | Will be your Vercel URL after deployment |
 
-# Clerk URLs (update after getting Vercel URL)
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/dashboard
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/dashboard
+**❗ IMPORTANT:** Enter these as **direct values**, NOT as secret references like `@production-url`. Just paste the actual values.
 
-# App URL (will be your-project.vercel.app)
-NEXT_PUBLIC_APP_URL=https://your-project.vercel.app
-NODE_ENV=production
-```
-
-**Note:** After first deployment, update `NEXT_PUBLIC_APP_URL` with your actual Vercel URL.
+**⚠️ Note:** After first deployment, update `NEXT_PUBLIC_APP_URL` with your actual Vercel URL (e.g., `https://promptvault-5j8e9x.vercel.app`).
 
 ### **Step 4: Configure Build Settings**
 

@@ -39,3 +39,4 @@ jobs:
           DATABASE_URL: "file:./test.db"
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "test-key"
           CLERK_SECRET_KEY: "test-secret-key"
+          NEXT_PUBLIC_APP_URL: "https://test.example.com"

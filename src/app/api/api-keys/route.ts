@@ -12,14 +12,21 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get organization
+    // Get or create organization
     const organizationId = orgId || `user_${userId}`
-    const organization = await prisma.organization.findUnique({
+    let organization = await prisma.organization.findUnique({
       where: { clerkOrgId: organizationId },
     })
 
     if (!organization) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
+      // Auto-create organization if it doesn't exist
+      organization = await prisma.organization.create({
+        data: {
+          name: organizationId.startsWith('user_') ? 'Personal' : organizationId,
+          slug: organizationId,
+          clerkOrgId: organizationId,
+        },
+      })
     }
 
     // Get all API keys (never return the full key)

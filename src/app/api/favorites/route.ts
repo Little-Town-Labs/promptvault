@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
@@ -11,23 +11,50 @@ export async function GET(_request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get user
-    const user = await prisma.user.findUnique({
+    const clerkUser = await currentUser()
+    if (!clerkUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    // Get or create user in database
+    let user = await prisma.user.findUnique({
       where: { clerkUserId: userId },
     })
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+      user = await prisma.user.create({
+        data: {
+          clerkUserId: userId,
+          email: clerkUser.emailAddresses[0]?.emailAddress || '',
+          firstName: clerkUser.firstName,
+          lastName: clerkUser.lastName,
+        },
+      })
     }
 
-    // Get organization
+    // Get or create organization
     const organizationId = orgId || `user_${userId}`
-    const organization = await prisma.organization.findUnique({
+    let organization = await prisma.organization.findUnique({
       where: { clerkOrgId: organizationId },
     })
 
     if (!organization) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
+      organization = await prisma.organization.create({
+        data: {
+          clerkOrgId: organizationId,
+          name: orgId ? 'Organization' : `${clerkUser.firstName || 'Personal'} Workspace`,
+          slug: organizationId.toLowerCase().replace(/[^a-z0-9]/g, '-'),
+        },
+      })
+
+      // Create organization user relationship
+      await prisma.organizationUser.create({
+        data: {
+          organizationId: organization.id,
+          userId: user.id,
+          role: 'OWNER',
+        },
+      })
     }
 
     // Get all favorites with prompt details

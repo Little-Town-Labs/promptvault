@@ -1,4 +1,5 @@
 import { currentUser } from '@clerk/nextjs/server'
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -72,18 +73,24 @@ export default async function DashboardPage() {
           <CardDescription>Get started with your prompt library</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Button className="h-24 flex flex-col items-center justify-center gap-2">
-            <span className="text-2xl">➕</span>
-            <span>Create Prompt</span>
-          </Button>
-          <Button variant="outline" className="h-24 flex flex-col items-center justify-center gap-2">
-            <span className="text-2xl">🏷️</span>
-            <span>Add Category</span>
-          </Button>
-          <Button variant="outline" className="h-24 flex flex-col items-center justify-center gap-2">
-            <span className="text-2xl">📁</span>
-            <span>Create Collection</span>
-          </Button>
+          <Link href="/prompts/new">
+            <Button className="h-24 w-full flex flex-col items-center justify-center gap-2">
+              <span className="text-2xl">➕</span>
+              <span>Create Prompt</span>
+            </Button>
+          </Link>
+          <Link href="/categories">
+            <Button variant="outline" className="h-24 w-full flex flex-col items-center justify-center gap-2">
+              <span className="text-2xl">🏷️</span>
+              <span>Add Category</span>
+            </Button>
+          </Link>
+          <Link href="/collections">
+            <Button variant="outline" className="h-24 w-full flex flex-col items-center justify-center gap-2">
+              <span className="text-2xl">📁</span>
+              <span>Create Collection</span>
+            </Button>
+          </Link>
         </CardContent>
       </Card>
 
@@ -98,7 +105,9 @@ export default async function DashboardPage() {
             <span className="text-4xl mb-4 block">📝</span>
             <p className="text-lg font-medium mb-2">No prompts yet</p>
             <p className="text-sm mb-4">Create your first prompt to get started</p>
-            <Button>Create Your First Prompt</Button>
+            <Link href="/prompts/new">
+              <Button>Create Your First Prompt</Button>
+            </Link>
           </div>
         </CardContent>
       </Card>

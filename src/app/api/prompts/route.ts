@@ -11,6 +11,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Get or find organization by Clerk ID
+    const clerkOrgId = orgId || `user_${userId}`
+    const organization = await prisma.organization.findUnique({
+      where: { clerkOrgId }
+    })
+
+    // If no organization exists yet, return empty array
+    if (!organization) {
+      return NextResponse.json([])
+    }
+
     // Get search params
     const searchParams = request.nextUrl.searchParams
     const search = searchParams.get('search')
@@ -21,7 +32,7 @@ export async function GET(request: NextRequest) {
     // Build where clause
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const where: any = {
-      organizationId: orgId || `user_${userId}`, // Fallback to user-based org if no org
+      organizationId: organization.id, // Use database organization ID
     }
 
     if (search) {

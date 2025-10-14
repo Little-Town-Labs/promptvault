@@ -123,8 +123,15 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json(prompts)
   } catch (error) {
     console.error('Error fetching favorites:', error)
+    if (error instanceof Error) {
+      console.error('Error details:', error.message, error.stack)
+    }
     return NextResponse.json(
-      { error: 'Failed to fetch favorites' },
+      {
+        error: 'Failed to fetch favorites',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+      },
       { status: 500 }
     )
   }

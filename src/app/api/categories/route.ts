@@ -17,8 +17,9 @@ export async function GET(_request: NextRequest) {
       where: { clerkOrgId: organizationId },
     })
 
+    // If no organization exists yet, return empty array
     if (!organization) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 })
+      return NextResponse.json([])
     }
 
     // Get all categories with prompt counts
@@ -47,8 +48,15 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json(transformedCategories)
   } catch (error) {
     console.error('Error fetching categories:', error)
+    if (error instanceof Error) {
+      console.error('Error details:', error.message, error.stack)
+    }
     return NextResponse.json(
-      { error: 'Failed to fetch categories' },
+      {
+        error: 'Failed to fetch categories',
+        message: error instanceof Error ? error.message : 'Unknown error',
+        details: process.env.NODE_ENV === 'development' ? String(error) : undefined
+      },
       { status: 500 }
     )
   }

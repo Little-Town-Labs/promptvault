@@ -128,8 +128,8 @@ export default function NewPromptPage() {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to create prompt')
+        const errorData = await response.json()
+        throw new Error(errorData.message || errorData.error || 'Failed to create prompt')
       }
 
       const _prompt = await response.json()

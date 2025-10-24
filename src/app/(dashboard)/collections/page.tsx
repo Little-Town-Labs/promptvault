@@ -164,7 +164,7 @@ export default function CollectionsPage() {
         body: JSON.stringify({
           name: formData.name.trim(),
           description: formData.description.trim() || null,
-          parentId: formData.parentId || null,
+          parentId: formData.parentId && formData.parentId !== 'none' ? formData.parentId : null,
         }),
       })
 
@@ -200,7 +200,7 @@ export default function CollectionsPage() {
         body: JSON.stringify({
           name: formData.name.trim(),
           description: formData.description.trim() || null,
-          parentId: formData.parentId || null,
+          parentId: formData.parentId && formData.parentId !== 'none' ? formData.parentId : null,
         }),
       })
 
@@ -423,7 +423,7 @@ export default function CollectionsPage() {
                   <SelectValue placeholder="None (top level)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None (top level)</SelectItem>
+                  <SelectItem value="none">None (top level)</SelectItem>
                   {collections.map((collection) => (
                     <SelectItem key={collection.id} value={collection.id}>
                       {collection.name}
@@ -503,7 +503,7 @@ export default function CollectionsPage() {
                   <SelectValue placeholder="None (top level)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None (top level)</SelectItem>
+                  <SelectItem value="none">None (top level)</SelectItem>
                   {getAvailableParentCollections().map((collection) => (
                     <SelectItem key={collection.id} value={collection.id}>
                       {collection.name}

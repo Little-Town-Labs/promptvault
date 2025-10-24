@@ -86,7 +86,7 @@ export default function PromptsPage() {
       if (searchQuery) {
         params.append('search', searchQuery)
       }
-      if (category) {
+      if (category && category !== 'all') {
         params.append('category', category)
       }
 
@@ -121,7 +121,7 @@ export default function PromptsPage() {
 
   const handleClearFilters = () => {
     setSearch('')
-    setCategoryFilter('')
+    setCategoryFilter('all')
     fetchPrompts()
   }
 
@@ -229,7 +229,7 @@ export default function PromptsPage() {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
                       <div className="flex items-center gap-2">

@@ -122,7 +122,7 @@ export default function NewPromptPage() {
           description: formData.description.trim() || null,
           content: formData.content.trim(),
           variables: variables.length > 0 ? variables : null,
-          categoryId: formData.categoryId || null,
+          categoryId: formData.categoryId && formData.categoryId !== 'none' ? formData.categoryId : null,
           tags,
         }),
       })
@@ -213,7 +213,7 @@ export default function NewPromptPage() {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={category.id}>
                         <div className="flex items-center gap-2">

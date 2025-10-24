@@ -31,7 +31,8 @@
       "Bash(DATABASE_URL=\"postgresql://neondb_owner:npg_RjcPQNGX7f8g@ep-sweet-block-adh4xn39-pooler.c-2.us-east-1.aws.neon.tech/promptvault_test?sslmode=require\" pnpm db:push:*)",
       "Bash(pnpm e2e:ui:*)",
       "Bash(pnpm exec playwright test:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

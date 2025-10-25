@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -10,6 +11,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { useToast } from '@/hooks/use-toast'
 
 interface Category {
   id: string
@@ -50,6 +52,8 @@ export default function EditPromptPage() {
     status: 'DRAFT',
     categoryId: '',
   })
+  const [copied, setCopied] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchPrompt()
@@ -154,6 +158,31 @@ export default function EditPromptPage() {
     return Object.keys(newErrors).length === 0
   }
 
+  const handleCopyPrompt = async () => {
+    try {
+      // Format the prompt nicely for copying
+      const formattedPrompt = `# ${formData.title}
+
+${formData.description ? `${formData.description}\n\n` : ''}${formData.content}
+`.trim()
+
+      await navigator.clipboard.writeText(formattedPrompt)
+      setCopied(true)
+      toast({
+        title: 'Copied to clipboard!',
+        description: 'Prompt is ready to paste into Claude or any other tool.',
+      })
+      setTimeout(() => setCopied(false), 2000)
+    } catch (error) {
+      console.error('Error copying prompt:', error)
+      toast({
+        title: 'Failed to copy',
+        description: 'Please try again.',
+        variant: 'destructive',
+      })
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -251,9 +280,28 @@ export default function EditPromptPage() {
             Update your prompt details
           </p>
         </div>
-        <Button asChild variant="outline">
-          <Link href={`/prompts/${params.id}`}>Cancel</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleCopyPrompt}
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4 mr-2" />
+                Copied!
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4 mr-2" />
+                Copy
+              </>
+            )}
+          </Button>
+          <Button asChild variant="outline">
+            <Link href={`/prompts/${params.id}`}>Cancel</Link>
+          </Button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit}>

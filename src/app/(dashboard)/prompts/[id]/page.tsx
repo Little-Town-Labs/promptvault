@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -15,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useToast } from '@/hooks/use-toast'
 
 interface Version {
   id: string
@@ -87,6 +89,7 @@ export default function PromptDetailPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [copied, setCopied] = useState(false)
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchPrompt()
@@ -145,12 +148,26 @@ export default function PromptDetailPage() {
     if (!prompt) return
 
     try {
-      await navigator.clipboard.writeText(prompt.content)
+      // Format the prompt nicely for copying
+      const formattedPrompt = `# ${prompt.title}
+
+${prompt.description ? `${prompt.description}\n\n` : ''}${prompt.content}
+`.trim()
+
+      await navigator.clipboard.writeText(formattedPrompt)
       setCopied(true)
+      toast({
+        title: 'Copied to clipboard!',
+        description: 'Prompt is ready to paste into Claude or any other tool.',
+      })
       setTimeout(() => setCopied(false), 2000)
     } catch (error) {
       console.error('Error copying to clipboard:', error)
-      alert('Failed to copy to clipboard')
+      toast({
+        title: 'Failed to copy',
+        description: 'Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -274,7 +291,17 @@ export default function PromptDetailPage() {
           <div className="flex items-center justify-between">
             <CardTitle>Prompt Content</CardTitle>
             <Button variant="outline" size="sm" onClick={handleCopyContent}>
-              {copied ? '✓ Copied!' : '📋 Copy'}
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4 mr-2" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy to Clipboard
+                </>
+              )}
             </Button>
           </div>
         </CardHeader>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Copy, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -15,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { useToast } from '@/hooks/use-toast'
 
 interface Category {
   id: string
@@ -60,6 +62,8 @@ export default function PromptsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [promptToDelete, setPromptToDelete] = useState<Prompt | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchPrompts()
@@ -178,6 +182,35 @@ export default function PromptsPage() {
       alert('Failed to delete prompt. Please try again.')
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  const handleCopyPrompt = async (prompt: Prompt) => {
+    try {
+      // Format the prompt nicely for copying
+      const formattedPrompt = `# ${prompt.title}
+
+${prompt.description ? `${prompt.description}\n\n` : ''}${prompt.content}
+`.trim()
+
+      await navigator.clipboard.writeText(formattedPrompt)
+
+      // Show success state
+      setCopiedId(prompt.id)
+      toast({
+        title: 'Copied to clipboard!',
+        description: 'Prompt is ready to paste into Claude or any other tool.',
+      })
+
+      // Reset copied state after 2 seconds
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch (error) {
+      console.error('Error copying prompt:', error)
+      toast({
+        title: 'Failed to copy',
+        description: 'Please try again.',
+        variant: 'destructive',
+      })
     }
   }
 
@@ -318,6 +351,18 @@ export default function PromptsPage() {
                     )}
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCopyPrompt(prompt)}
+                      title="Copy to clipboard"
+                    >
+                      {copiedId === prompt.id ? (
+                        <Check className="h-4 w-4" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
                     <Button asChild variant="outline" size="sm">
                       <Link href={`/prompts/${prompt.id}/edit`}>Edit</Link>
                     </Button>
